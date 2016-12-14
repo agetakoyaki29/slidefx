@@ -15,16 +15,20 @@ import javafx.util.Duration
 
 
 object StageContaner
+
 class StageContaner(val stage: Stage) {
-	val rootPane = new BorderPane
-	val mainPane = new AnchorPane
+	private val centerPane = new AnchorPane
+	private val root = new BorderPane(centerPane)
 
+	private val mainNodes = centerPane.getChildren
+	private val menuBarProperty = root.topProperty
+
+	; {
 		// stage.initStyle(StageStyle.TRANSPARENT)
-	stage.getProperties.put(StageContaner, this)
-	// stage.setMaximized(true)
-
-	stage.setScene(new Scene(rootPane))
-	rootPane.setCenter(mainPane)
+		stage.getProperties.put(StageContaner, this)
+		// stage.setMaximized(true)
+		stage.setScene(new Scene(root));
+	}
 
 	def show(firstScene: SceneController) = {
 		moveScene(firstScene)
@@ -36,23 +40,33 @@ class StageContaner(val stage: Stage) {
 		setMainMenuBar(next.createMainMenu)
 		next.init
 
-		val prevOp = if(mainPane.getChildren.size <= 1) None
-								 else Some(mainPane.getChildren.get(mainPane.getChildren.size-2))
+		val prevOp = if(mainNodes.size <= 1) None
+								 else Some(mainNodes.get(mainNodes.size-2))
 
 		animateMove(next, prevOp)
 	}
 
 	private def addMainPane(node: SceneController) = {
-		mainPane.getChildren.add(node)
+		mainNodes.add(node)
 		AnchorPane.setBottomAnchor(node, 0)
 		AnchorPane.setLeftAnchor(node, 0)
 		AnchorPane.setRightAnchor(node, 0)
 		AnchorPane.setTopAnchor(node, 0)
 	}
 
+	def setMainMenuBar(nextOp: Option[MenuBar]) = {
+		Option(menuBarProperty.get.asInstanceOf[MenuBar]).foreach(_.setUseSystemMenuBar(false))
+		nextOp.foreach(_.setUseSystemMenuBar(true))
+
+		nextOp match {
+			case Some(menuBar) => menuBarProperty.set(menuBar)
+			case None => menuBarProperty.set(null)
+		}
+	}
+
 	private def animateMove(next: Node, prevOp: Option[Node]) = {
 		val duration = Duration.seconds(1)
-		val width = mainPane.getLayoutBounds.getWidth
+		val width = centerPane.getLayoutBounds.getWidth
 		; {
 			val slidIn = new TranslateTransition(duration, next)
 			slidIn.setFromX(width)
@@ -62,21 +76,18 @@ class StageContaner(val stage: Stage) {
 		prevOp.foreach(prev => {
 			val slidOut = new TranslateTransition(duration, prev)
 			slidOut.setToX(-width)
-			slidOut.setOnFinished(_ => mainPane.getChildren.remove(prev))
+			slidOut.setOnFinished(_ => mainNodes.remove(prev))
 			slidOut.play
 		})
 	}
-
-	def setMainMenuBar(nextOp: Option[MenuBar]) = {
-		Option(rootPane.getTop.asInstanceOf[MenuBar]).foreach(_.setUseSystemMenuBar(false))
-		nextOp.foreach(_.setUseSystemMenuBar(true))
-
-		nextOp match {
-			case Some(menuBar) => rootPane.setTop(menuBar)
-			case None => rootPane.setTop(null)
-		}
-	}
 }
+
+
+trait SceneController extends Parent with RootedController with StagedNode {
+	def createMainMenu: Option[MenuBar] = None
+	def init = {}
+}
+
 
 trait RootedController {
 	val loader = new FXMLLoader(location)
@@ -105,10 +116,6 @@ trait RootedController {
 	}
 }
 
-trait SceneController extends Parent with RootedController with StagedNode {
-	def createMainMenu: Option[MenuBar] = None
-	def init = {}
-}
 
 trait StagedNode extends Node {
 	def getSceneNonNull = Option(getScene)
@@ -132,5 +139,6 @@ trait StagedNode extends Node {
 	def isOnStage = try {getStageNonNull; true} catch {case e: StagedNodeException => false}
 	def isOnStageContaner = try {getStageContanerNonNull; true} catch {case e: StagedNodeException => false}
 }
+
 
 class StagedNodeException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)

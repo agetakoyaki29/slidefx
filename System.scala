@@ -1,9 +1,5 @@
 // package foo.bar
 
-import java.util.logging.Logger
-import java.io.IOException
-
-import javafx.fxml.FXMLLoader
 import javafx.stage.Stage
 import javafx.scene.{Scene, Node, Parent}
 import javafx.scene.layout.{BorderPane, AnchorPane}
@@ -89,34 +85,6 @@ trait SceneController extends Parent with RootedController with StagedNode {
 }
 
 
-trait RootedController {
-	val loader = new FXMLLoader(location)
-	loader.setRoot(this)
-	loader.setController(this)
-	try loader.load
-	catch { case e: IOException =>
-		Logger.getAnonymousLogger.warning("check fx:root, fx:controller attribute")
-		throw new RuntimeException("fxml loader can't load with location("+location+").", e)
-	}
-
-	def prefix = "C"
-
-	def fileName = {
-		val className = getClass.getSimpleName
-		val lastIndex = className.lastIndexOf(prefix)
-		if(lastIndex < 0) throw new RuntimeException("class name("+className+") doesn't include prefix("+prefix+").")
-		val fileName = className.substring(0, lastIndex) + ".fxml"
-		fileName
-	}
-
-	def location = {
-		val location = getClass.getResource(fileName)
-		if(location == null) throw new RuntimeException("class loader("+getClass+") can't find file with name ("+fileName+").")
-		location
-	}
-}
-
-
 trait StagedNode extends Node {
 	def getSceneNonNull = Option(getScene)
 		.getOrElse(throw new StagedNodeException("this node("+this+") isn't part of a scene"))
@@ -139,6 +107,5 @@ trait StagedNode extends Node {
 	def isOnStage = try {getStageNonNull; true} catch {case e: StagedNodeException => false}
 	def isOnStageContaner = try {getStageContanerNonNull; true} catch {case e: StagedNodeException => false}
 }
-
 
 class StagedNodeException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)

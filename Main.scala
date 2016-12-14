@@ -22,16 +22,18 @@ class MyApplication extends Application {
 	override def start(stage: Stage) = new StageContaner(stage).show(new TopController)
 }
 
+
 class TopController extends StackPane with SceneController {
 	@FXML def onAction(event: ActionEvent) =  getStageContanerNonNull.moveScene(new EditerController)
 }
+
 
 class EditerController extends BorderPane with SceneController {
 	@FXML var mainTabPane: TabPane = _
 
 	mainTabPane.setFocusTraversable(false)
 
-	override def createMainMenu = Some(new MenuBarController(this))
+	override def createMainMenu = Some(new EditerMenuBarController(this))
 
 	def addAndSelectTab(tab: TextTabController) = {
 		mainTabPane.getTabs.add(tab)
@@ -48,16 +50,8 @@ class EditerController extends BorderPane with SceneController {
 	def getSelectedItem = mainTabPane.getSelectionModel.getSelectedItem.asInstanceOf[TextTabController]
 }
 
-object TextTabController
-class TextTabController(val fileOp: Option[File]) extends Tab with RootedController {
-	this.getProperties.put(TextTabController, this)
 
-	fileOp.foreach(file => setText(file.getName))
-
-	def save = println("saved")
-}
-
-class MenuBarController(val editerController: EditerController) extends MenuBar with RootedController with StagedNode {
+class EditerMenuBarController(val editerController: EditerController) extends MenuBar with RootedController with StagedNode {
 	@FXML def onFileNew(event: ActionEvent) = editerController.addAndSelectTab(new TextTabController(None))
 	@FXML def onFileOpen(event: ActionEvent) = editerController.addAndSelectTab(new TextTabController( FCM.showOpenDialog(getSceneNonNull.getWindow) ))
 	@FXML def onFileReopen(event: ActionEvent) = println(getSceneNonNull.getFocusOwner)
@@ -75,6 +69,17 @@ class MenuBarController(val editerController: EditerController) extends MenuBar 
 
 	@FXML def onHelpHelp(event: ActionEvent) = ???
 	@FXML def onHelpAbout(event: ActionEvent) = ???
+}
+
+
+object TextTabController
+
+class TextTabController(val fileOp: Option[File]) extends Tab with RootedController {
+	this.getProperties.put(TextTabController, this)
+
+	fileOp.foreach(file => setText(file.getName))
+
+	def save = println("saved")
 }
 
 // ----

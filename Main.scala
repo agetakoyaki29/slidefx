@@ -85,47 +85,48 @@ class TextTabController(val fileOp: Option[File]) extends Tab with RootedControl
 // ----
 
 object FCM {
-	val that = new FCM(null)
+	val that = new FCM(None)
   def showOpenDialog(owner: Window) = that.showOpenDialog(owner)
   def showSaveDialog(owner: Window) = that.showSaveDialog(owner)
 	def showSaveDialog(owner: Window, fileName: String) = that.showSaveDialog(owner, fileName)
 }
 
-class FCM private (private var initialDirectory: File) {
+class FCM private (var workDirOp: Option[File]) {
 	private lazy val opener = {
-		val fileChooser = new FileChooser();
-		fileChooser.getExtensionFilters().addAll(
+		val fc = new FileChooser();
+		fc.getExtensionFilters().addAll(
 				new ExtensionFilter("Text Files", "*.txt"),
 				new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
 				new ExtensionFilter("Audio Files", "*.wav", "*.mp3", "*.aac"),
 				new ExtensionFilter("All Files", "*.*")
 		)
-		fileChooser
-	}
-
-	def showOpenDialog(owner: Window) = {
-		val fileChooser = opener
-		if(initialDirectory != null) fileChooser.setInitialDirectory(initialDirectory)
-		val fileOp = Option( fileChooser.showOpenDialog(owner) )
-		fileOp.foreach(file => initialDirectory = file.getParentFile)
-		fileOp
+		fc
 	}
 
 	private lazy val saver = {
-		val fileChooser = new FileChooser();
-		fileChooser.getExtensionFilters().addAll(
+		val fc = new FileChooser();
+		fc.getExtensionFilters().addAll(
 				new ExtensionFilter("Text Files", "*.txt")
 		)
-		fileChooser
+		fc
 	}
 
-	def showSaveDialog(owner: Window): Option[File] = showSaveDialog(owner, "")
-	def showSaveDialog(owner: Window, fileName: String) = {
-		val fileChooser = saver
-		fileChooser.setInitialFileName(fileName)
-		if(initialDirectory != null) fileChooser.setInitialDirectory(initialDirectory)
-		val fileOp = Option( fileChooser.showSaveDialog(owner) )
-		fileOp.foreach(file => initialDirectory = file.getParentFile)
+	def showOpenDialog(owner: Window) = {
+		val fc = opener
+		workDirOp.foreach(fc.setInitialDirectory(_))
+
+		val fileOp = Option( fc.showOpenDialog(owner) )
+		fileOp.foreach(file => workDirOp = Option(file.getParentFile))
+		fileOp
+	}
+
+	def showSaveDialog(owner: Window, fileName: String = "") = {
+		val fc = saver
+		workDirOp.foreach(fc.setInitialDirectory(_))
+		fc.setInitialFileName(fileName)
+
+		val fileOp = Option( fc.showSaveDialog(owner) )
+		fileOp.foreach(file => workDirOp = Option(file.getParentFile))
 		fileOp
 	}
 }

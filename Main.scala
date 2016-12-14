@@ -27,13 +27,11 @@ class TopController extends StackPane with SceneController {
 }
 
 class EditerController extends BorderPane with SceneController {
-	override def createMainMenu = Some(new MenuBarController(this))
-
 	@FXML var mainTabPane: TabPane = _
-	println(mainTabPane)
-	println(mainTabPane.isFocusTraversable)
+	
 	mainTabPane.setFocusTraversable(false)
-	println(mainTabPane.isFocusTraversable)
+
+	override def createMainMenu = Some(new MenuBarController(this))
 
 	def addAndSelectTab(tab: TextTabController) = {
 		mainTabPane.getTabs.add(tab)

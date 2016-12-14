@@ -42,7 +42,15 @@ class StageContaner(val stage: Stage) {
 		animateMove(next, prevOp)
 	}
 
-	def animateMove(next: Node, prevOp: Option[Node]) = {
+	private def addMainPane(node: SceneController) = {
+		mainPane.getChildren.add(node)
+		AnchorPane.setBottomAnchor(node, 0)
+		AnchorPane.setLeftAnchor(node, 0)
+		AnchorPane.setRightAnchor(node, 0)
+		AnchorPane.setTopAnchor(node, 0)
+	}
+
+	private def animateMove(next: Node, prevOp: Option[Node]) = {
 		val duration = Duration.seconds(1)
 		val width = mainPane.getLayoutBounds.getWidth
 		; {
@@ -59,25 +67,14 @@ class StageContaner(val stage: Stage) {
 		})
 	}
 
-	def addMainPane(node: Node) = {
-		mainPane.getChildren.add(node)
-		AnchorPane.setBottomAnchor(node, 0)
-		AnchorPane.setLeftAnchor(node, 0)
-		AnchorPane.setRightAnchor(node, 0)
-		AnchorPane.setTopAnchor(node, 0)
-	}
-
 	def setMainMenuBar(nextOp: Option[MenuBar]) = {
-		setSystemMenuBar(nextOp)
+		Option(rootPane.getTop.asInstanceOf[MenuBar]).foreach(_.setUseSystemMenuBar(false))
+		nextOp.foreach(_.setUseSystemMenuBar(true))
+
 		nextOp match {
 			case Some(menuBar) => rootPane.setTop(menuBar)
 			case None => rootPane.setTop(null)
 		}
-	}
-
-	private def setSystemMenuBar(nextOp: Option[MenuBar]) = {
-		Option(rootPane.getTop.asInstanceOf[MenuBar]).foreach(_.setUseSystemMenuBar(false))
-		nextOp.foreach(_.setUseSystemMenuBar(true))
 	}
 }
 
@@ -108,32 +105,25 @@ trait RootedController {
 	}
 }
 
-trait StagedNode extends Node {
-	def getSceneNonNull = Mydef.nonNull(super.getScene, "this node("+this+") isn't part of a scene")
-
-	def getStage = getSceneNonNull.getWindow.asInstanceOf[Stage]
-
-	def getStageContaner = getSceneNonNull.getWindow.getProperties.get(StageContaner).asInstanceOf[StageContaner]
-}
-
-object StagedNode {
-	def getStageTest = {
-		val node = new BorderPane with StagedNode
-		val scene = new Scene(node)
-		node.getStage
-		val stage = new Stage()
-		stage.setScene(scene)
-		node.getStage
-	}
-}
-object Mydef {
-	def nonNull[T](any: T): T = nonNull(any, "("+any+") must not be null")
-	def nonNull[T](any: T, message: String): T = Option(any).getOrElse(throw new NullPointerException(message))
-
-	def doAny[T](any: T, f: T => Unit) = ??? // if non null then do
-}
-
 trait SceneController extends Parent with RootedController with StagedNode {
 	def createMainMenu: Option[MenuBar] = None
 	def init = {}
+}
+
+trait StagedNode extends Node {
+	def getSceneNonNull = Option(getScene)
+		.getOrElse(throw new RuntimeException("this node("+this+") isn't part of a scene"))
+
+	def getWindowNonNull = Option(getSceneNonNull.getWindow)
+		.getOrElse(throw new RuntimeException("this scene("+getSceneNonNull+") isn't part of a window"))
+
+	def getStageNonNull = Option(getWindowNonNull.asInstanceOf[Stage])
+		.getOrElse(throw new RuntimeException("this window("+getWindowNonNull+") isn't a Stage"))
+
+	def getStageContaner = {
+		val value = Option(getWindowNonNull.getProperties.get(StageContaner))
+			.getOrElse(throw new RuntimeException("this window("+getWindowNonNull+") isn't a StageContaner"))
+		Option(value.asInstanceOf[StageContaner])
+			.getOrElse(throw new RuntimeException("this window("+getWindowNonNull+") isn't a StageContaner"))
+	}
 }

@@ -112,18 +112,25 @@ trait SceneController extends Parent with RootedController with StagedNode {
 
 trait StagedNode extends Node {
 	def getSceneNonNull = Option(getScene)
-		.getOrElse(throw new RuntimeException("this node("+this+") isn't part of a scene"))
+		.getOrElse(throw new StagedNodeException("this node("+this+") isn't part of a scene"))
 
 	def getWindowNonNull = Option(getSceneNonNull.getWindow)
-		.getOrElse(throw new RuntimeException("this scene("+getSceneNonNull+") isn't part of a window"))
+		.getOrElse(throw new StagedNodeException("this scene("+getSceneNonNull+") isn't part of a window"))
 
 	def getStageNonNull = Option(getWindowNonNull.asInstanceOf[Stage])
-		.getOrElse(throw new RuntimeException("this window("+getWindowNonNull+") isn't a Stage"))
+		.getOrElse(throw new StagedNodeException("this window("+getWindowNonNull+") isn't a Stage"))
 
-	def getStageContaner = {
+	def getStageContanerNonNull = {
 		val value = Option(getWindowNonNull.getProperties.get(StageContaner))
-			.getOrElse(throw new RuntimeException("this window("+getWindowNonNull+") isn't a StageContaner"))
+			.getOrElse(throw new StagedNodeException("this window("+getWindowNonNull+") isn't a StageContaner"))
 		Option(value.asInstanceOf[StageContaner])
-			.getOrElse(throw new RuntimeException("this window("+getWindowNonNull+") isn't a StageContaner"))
+			.getOrElse(throw new StagedNodeException("this window("+getWindowNonNull+") isn't a StageContaner"))
 	}
+
+	def isOnScene = try {getSceneNonNull; true} catch {case e: StagedNodeException => false}
+	def isOnWindow = try {getWindowNonNull; true} catch {case e: StagedNodeException => false}
+	def isOnStage = try {getStageNonNull; true} catch {case e: StagedNodeException => false}
+	def isOnStageContaner = try {getStageContanerNonNull; true} catch {case e: StagedNodeException => false}
 }
+
+class StagedNodeException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)

@@ -23,12 +23,12 @@ class MyApplication extends Application {
 }
 
 class TopController extends StackPane with SceneController {
-	@FXML def onAction(event: ActionEvent) =  getStageContaner.moveScene(new EditerController)
+	@FXML def onAction(event: ActionEvent) =  getStageContanerNonNull.moveScene(new EditerController)
 }
 
 class EditerController extends BorderPane with SceneController {
 	@FXML var mainTabPane: TabPane = _
-	
+
 	mainTabPane.setFocusTraversable(false)
 
 	override def createMainMenu = Some(new MenuBarController(this))
@@ -70,8 +70,8 @@ class MenuBarController(val editerController: EditerController) extends MenuBar 
 
 	@FXML def onFileExit(event: ActionEvent) = getSceneNonNull.getWindow.hide
 
-	@FXML def onSceneTop(event: ActionEvent) = getStageContaner.moveScene(new TopController)
-	@FXML def onSceneEditer(event: ActionEvent) = getStageContaner.moveScene(new EditerController)
+	@FXML def onSceneTop(event: ActionEvent) = getStageContanerNonNull.moveScene(new TopController)
+	@FXML def onSceneEditer(event: ActionEvent) = getStageContanerNonNull.moveScene(new EditerController)
 
 	@FXML def onHelpHelp(event: ActionEvent) = ???
 	@FXML def onHelpAbout(event: ActionEvent) = ???

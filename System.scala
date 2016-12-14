@@ -45,20 +45,18 @@ class StageContaner(val stage: Stage) {
 	def animateMove(next: Node, prevOp: Option[Node]) = {
 		val duration = Duration.seconds(1)
 		val width = mainPane.getLayoutBounds.getWidth
-
-		val slidIn = new TranslateTransition(duration, next)
-		slidIn.setFromX(width)
-		slidIn.setToX(0)
-		slidIn.play
-
-		prevOp match {
-			case Some(prev) =>
-				val slidOut = new TranslateTransition(duration, prev)
-				slidOut.setToX(-width)
-				slidOut.setOnFinished(_ => mainPane.getChildren.remove(prev))
-				slidOut.play
-			case None =>
+		; {
+			val slidIn = new TranslateTransition(duration, next)
+			slidIn.setFromX(width)
+			slidIn.setToX(0)
+			slidIn.play
 		}
+		prevOp.foreach(prev => {
+			val slidOut = new TranslateTransition(duration, prev)
+			slidOut.setToX(-width)
+			slidOut.setOnFinished(_ => mainPane.getChildren.remove(prev))
+			slidOut.play
+		})
 	}
 
 	def addMainPane(node: Node) = {
@@ -69,19 +67,17 @@ class StageContaner(val stage: Stage) {
 		AnchorPane.setTopAnchor(node, 0)
 	}
 
-	def setMainMenuBar(option: Option[MenuBar]) = {
-		val before = Option(rootPane.getTop).map(_.asInstanceOf[MenuBar])
-		before match {
-			case Some(menuBar) => menuBar.setUseSystemMenuBar(false)
-			case None =>
+	def setMainMenuBar(nextOp: Option[MenuBar]) = {
+		setSystemMenuBar(nextOp)
+		nextOp match {
+			case Some(menuBar) => rootPane.setTop(menuBar)
+			case None => rootPane.setTop(null)
 		}
-		option match {
-			case Some(menuBar) =>
-				menuBar.setUseSystemMenuBar(true)
-				rootPane.setTop(menuBar)
-			case None =>
-				rootPane.setTop(null)
-		}
+	}
+
+	private def setSystemMenuBar(nextOp: Option[MenuBar]) = {
+		Option(rootPane.getTop.asInstanceOf[MenuBar]).foreach(_.setUseSystemMenuBar(false))
+		nextOp.foreach(_.setUseSystemMenuBar(true))
 	}
 }
 

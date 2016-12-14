@@ -54,10 +54,7 @@ object TextTabController
 class TextTabController(val fileOp: Option[File]) extends Tab with RootedController {
 	this.getProperties.put(TextTabController, this)
 
-	fileOp match {
-		case Some(file) => setText(file.getName)
-		case None =>
-	}
+	fileOp.foreach(file => setText(file.getName))
 
 	def save = println("saved")
 }
@@ -66,14 +63,10 @@ class MenuBarController(val editerController: EditerController) extends MenuBar 
 	@FXML def onFileNew(event: ActionEvent) = editerController.addAndSelectTab(new TextTabController(None))
 	@FXML def onFileOpen(event: ActionEvent) = editerController.addAndSelectTab(new TextTabController( FCM.showOpenDialog(getSceneNonNull.getWindow) ))
 	@FXML def onFileReopen(event: ActionEvent) = println(getSceneNonNull.getFocusOwner)
-	@FXML def onFileSave(event: ActionEvent) = Option(editerController.getSelectedItem) match {
-		case None =>
-		case Some(tab) =>
-			tab.fileOp match {
-				case None => editerController.addAndSelectTab(new TextTabController( FCM.showSaveDialog(getSceneNonNull.getWindow) ))
-				case Some(file) => tab.save
-			}
-	}
+	@FXML def onFileSave(event: ActionEvent) = Option(editerController.getSelectedItem).foreach(tab => { tab.fileOp match {
+			case None => editerController.addAndSelectTab(new TextTabController( FCM.showSaveDialog(getSceneNonNull.getWindow) ))
+			case Some(file) => tab.save
+	}})
 	@FXML def onFileSaveAs(event: ActionEvent) = println( FCM.showSaveDialog(getSceneNonNull.getWindow) )
 	@FXML def onFileCloseTab(event: ActionEvent) = editerController.toClosetab
 
@@ -111,7 +104,7 @@ class FCM private (private var initialDirectory: File) {
 		val fileChooser = opener
 		if(initialDirectory != null) fileChooser.setInitialDirectory(initialDirectory)
 		val fileOp = Option( fileChooser.showOpenDialog(owner) )
-		if(fileOp.isDefined) initialDirectory = fileOp.get.getParentFile
+		fileOp.foreach(file => initialDirectory = file.getParentFile)
 		fileOp
 	}
 
@@ -129,7 +122,7 @@ class FCM private (private var initialDirectory: File) {
 		fileChooser.setInitialFileName(fileName)
 		if(initialDirectory != null) fileChooser.setInitialDirectory(initialDirectory)
 		val fileOp = Option( fileChooser.showSaveDialog(owner) )
-		if(fileOp.isDefined) initialDirectory = fileOp.get.getParentFile
+		fileOp.foreach(file => initialDirectory = file.getParentFile)
 		fileOp
 	}
 }

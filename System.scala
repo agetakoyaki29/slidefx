@@ -21,8 +21,8 @@ class StageContaner(val stage: Stage) {
 
 	; {
 		// stage.initStyle(StageStyle.TRANSPARENT)
-		stage.getProperties.put(StageContaner, this)
 		// stage.setMaximized(true)
+		stage.getProperties.put(StageContaner, this)
 		stage.setScene(new Scene(root));
 	}
 
@@ -62,16 +62,21 @@ class StageContaner(val stage: Stage) {
 
 	private def animateMove(next: Node, prevOp: Option[Node]) = {
 		val duration = Duration.seconds(1)
+		val interpolator = new SineInterpolator(.3)
 		val width = centerPane.getLayoutBounds.getWidth
+
 		; {
 			val slidIn = new TranslateTransition(duration, next)
 			slidIn.setFromX(width)
 			slidIn.setToX(0)
+			slidIn.setInterpolator(interpolator)
 			slidIn.play
 		}
 		prevOp.foreach(prev => {
+			// prev.setClip(prev.getParent)
 			val slidOut = new TranslateTransition(duration, prev)
 			slidOut.setToX(-width)
+			slidOut.setInterpolator(interpolator)
 			slidOut.setOnFinished(_ => mainNodes.remove(prev))
 			slidOut.play
 		})

@@ -3,7 +3,7 @@
 import javafx.stage.Stage
 import javafx.scene.{Scene, Node, Parent}
 import javafx.scene.layout.{BorderPane, AnchorPane}
-import javafx.scene.control.MenuBar
+import javafx.scene.control.{MenuBar, Menu}
 
 import javafx.event.{ActionEvent, EventHandler}
 import javafx.animation.TranslateTransition
@@ -13,11 +13,12 @@ import javafx.util.Duration
 object StageContaner
 
 class StageContaner(val stage: Stage) {
-	private val centerPane = new AnchorPane
+	private val centerPane = new AnchorPane(new AnchorPane)
 	private val root = new BorderPane(centerPane)
 
 	private val mainNodes = centerPane.getChildren
 	private val menuBarProperty = root.topProperty
+	menuBarProperty.set(defaultMenuBar)
 
 	; {
 		// stage.initStyle(StageStyle.TRANSPARENT)
@@ -26,20 +27,24 @@ class StageContaner(val stage: Stage) {
 		stage.setScene(new Scene(root));
 	}
 
+	private def getNow = mainNodes.get(mainNodes.size-1)
+
 	def show(firstScene: SceneController) = {
 		moveScene(firstScene)
 		stage.show
 	}
 
+	def packToNow = {
+		
+	}
+
 	def moveScene(next: SceneController) = {
-		addMainPane(next)
 		setMainMenuBar(next.createMainMenu)
 		next.init
+		val perv = getNow
+		addMainPane(next)
 
-		val prevOp = if(mainNodes.size <= 1) None
-								 else Some(mainNodes.get(mainNodes.size-2))
-
-		animateMove(next, prevOp)
+		animateMove(next, perv)
 	}
 
 	private def addMainPane(node: SceneController) = {
@@ -56,11 +61,13 @@ class StageContaner(val stage: Stage) {
 
 		nextOp match {
 			case Some(menuBar) => menuBarProperty.set(menuBar)
-			case None => menuBarProperty.set(null)
+			case None => menuBarProperty.set(defaultMenuBar)
 		}
 	}
 
-	private def animateMove(next: Node, prevOp: Option[Node]) = {
+	private lazy val defaultMenuBar = new MenuBar(new Menu("null"))
+
+	private def animateMove(next: Node, prev: Node) = {
 		val duration = Duration.seconds(1)
 		val interpolator = new SineInterpolator(.3)
 		val width = centerPane.getLayoutBounds.getWidth
@@ -72,14 +79,14 @@ class StageContaner(val stage: Stage) {
 			slidIn.setInterpolator(interpolator)
 			slidIn.play
 		}
-		prevOp.foreach(prev => {
+		; {
 			// prev.setClip(prev.getParent)
 			val slidOut = new TranslateTransition(duration, prev)
 			slidOut.setToX(-width)
 			slidOut.setInterpolator(interpolator)
 			slidOut.setOnFinished(_ => mainNodes.remove(prev))
 			slidOut.play
-		})
+		}
 	}
 }
 

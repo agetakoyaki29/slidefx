@@ -33,20 +33,16 @@ class StageContaner(val stage: Stage) {
 		stage.show
 	}
 
-	def packToNow = {
-
-	}
-
 	def moveScene(next: SceneController) = {
 		setMainMenuBar(next.createMainMenu)
-		next.init
 		val perv = getNow
-		addMainPane(next)
+		addCenterPane(next)
+		next.staged
 
 		animateMove(next, perv)
 	}
 
-	private def addMainPane(node: SceneController) = {
+	private def addCenterPane(node: SceneController) = {
 		mainNodes.add(node)
 		AnchorPane.setBottomAnchor(node, 0)
 		AnchorPane.setLeftAnchor(node, 0)
@@ -70,7 +66,6 @@ class StageContaner(val stage: Stage) {
 		val duration = Duration.seconds(1)
 		val interpolator = new SineInterpolator(.3)
 		val width = centerPane.getLayoutBounds.getWidth
-
 		; {
 			val slidIn = new TranslateTransition(duration, next)
 			slidIn.setFromX(width)
@@ -92,7 +87,7 @@ class StageContaner(val stage: Stage) {
 
 trait SceneController extends Parent with RootedController with StagedNode {
 	def createMainMenu: Option[MenuBar] = None
-	def init = {}
+	def staged = {}
 }
 
 

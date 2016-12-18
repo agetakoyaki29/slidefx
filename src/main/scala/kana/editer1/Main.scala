@@ -1,12 +1,11 @@
-// package foo.bar
+package kana.editer1
 
 import java.io.File
-
 import javafx.fxml.FXML
-import javafx.application.{Application, Platform}
-import javafx.stage.{Window, Stage, StageStyle, FileChooser}
-import FileChooser.ExtensionFilter
-import javafx.scene.layout.{Region, BorderPane, StackPane}
+import javafx.application.Application
+import javafx.stage.{Window, Stage, FileChooser}
+import javafx.stage.FileChooser.ExtensionFilter
+import javafx.scene.layout.{BorderPane, StackPane}
 import javafx.scene.control.{TabPane, Tab, MenuBar}
 import javafx.event.ActionEvent
 

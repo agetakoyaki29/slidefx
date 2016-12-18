@@ -1,13 +1,12 @@
-// package foo.bar
+package kana.editer1
 
 import javafx.stage.Stage
 import javafx.scene.{Scene, Node, Parent}
 import javafx.scene.layout.{BorderPane, AnchorPane}
 import javafx.scene.control.{MenuBar, Menu}
-
-import javafx.event.{ActionEvent, EventHandler}
 import javafx.animation.TranslateTransition
 import javafx.util.Duration
+import javafx.event.ActionEvent
 
 
 object StageContaner
@@ -35,7 +34,7 @@ class StageContaner(val stage: Stage) {
 	}
 
 	def packToNow = {
-		
+
 	}
 
 	def moveScene(next: SceneController) = {
@@ -84,7 +83,7 @@ class StageContaner(val stage: Stage) {
 			val slidOut = new TranslateTransition(duration, prev)
 			slidOut.setToX(-width)
 			slidOut.setInterpolator(interpolator)
-			slidOut.setOnFinished(_ => mainNodes.remove(prev))
+			slidOut.setOnFinished((_: ActionEvent) => mainNodes.remove(prev))
 			slidOut.play
 		}
 	}

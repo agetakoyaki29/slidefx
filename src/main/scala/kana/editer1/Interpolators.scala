@@ -1,3 +1,4 @@
+package kana.editer1
 
 import javafx.animation.Interpolator
 

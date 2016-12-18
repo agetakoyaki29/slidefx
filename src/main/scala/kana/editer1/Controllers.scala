@@ -1,7 +1,6 @@
-// package foo.bar
+package kana.editer1
 
 import java.io.IOException
-
 import javafx.fxml.FXMLLoader
 
 

@@ -1,2 +1,11 @@
 
-*.class
+# SBT
+target/
+project/
+
+# Eclipse
+.classpath
+.settings/
+.project
+.cache-main
+bin/

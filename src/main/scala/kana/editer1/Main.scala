@@ -54,7 +54,6 @@ class EditerController extends BorderPane with SceneController {
 	@FXML var mainTabPane: TabPane = _
 
 	mainTabPane.setTabClosingPolicy(TabClosingPolicy.ALL_TABS)
-	mainTabPane.setFocusTraversable(false)
 
 	override def createMainMenu = Some(new EditerMenuBarController(this))
 

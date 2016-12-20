@@ -2,6 +2,7 @@
 # SBT
 target/
 project/
+.tmpBin/
 
 # Eclipse
 .classpath

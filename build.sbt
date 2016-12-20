@@ -1,5 +1,5 @@
-lazy val root = (project in file(".")).
-  settings(
+lazy val root = (project in file("."))
+  .settings(
     name := "scala editer fx",
     version := "0.0",
     scalaVersion := "2.12.0",

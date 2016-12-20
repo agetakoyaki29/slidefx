@@ -7,6 +7,7 @@ import javafx.stage.{Window, Stage, FileChooser}
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.scene.layout.{BorderPane, StackPane}
 import javafx.scene.control.{TabPane, Tab, MenuBar}
+import TabPane.TabClosingPolicy
 import javafx.event.ActionEvent
 
 
@@ -16,6 +17,7 @@ object Main {
 		Application.launch(classOf[MyApplication], args:_*)
 	}
 }
+
 
 class MyApplication extends Application {
 	override def start(stage: Stage) = new StageContaner(stage).show(new TopController)
@@ -27,35 +29,12 @@ class TopController extends StackPane with SceneController {
 }
 
 
-class EditerController extends BorderPane with SceneController {
-	@FXML var mainTabPane: TabPane = _
-
-	mainTabPane.setFocusTraversable(false)
-
-	override def createMainMenu = Some(new EditerMenuBarController(this))
-
-	def addAndSelectTab(tab: TextTabController) = {
-		mainTabPane.getTabs.add(tab)
-		val sm = mainTabPane.getSelectionModel
-		sm.select(tab)
-	}
-
-	def toClosetab = {
-		val index = mainTabPane.getSelectionModel.getSelectedIndex
-		if(index >= 0) mainTabPane.getTabs.remove(index)
-		else getSceneNonNull.getWindow.hide
-	}
-
-	def getSelectedItem = mainTabPane.getSelectionModel.getSelectedItem.asInstanceOf[TextTabController]
-}
-
-
 class EditerMenuBarController(val editerController: EditerController) extends MenuBar with RootedController with StagedNode {
-	@FXML def onFileNew(event: ActionEvent) = editerController.addAndSelectTab(new TextTabController(None))
-	@FXML def onFileOpen(event: ActionEvent) = editerController.addAndSelectTab(new TextTabController( FCM.showOpenDialog(getSceneNonNull.getWindow) ))
+	@FXML def onFileNew(event: ActionEvent) = editerController.addAndSelectTab(new FileTabController(None))
+	@FXML def onFileOpen(event: ActionEvent) = editerController.addAndSelectTab(new FileTabController( FCM.showOpenDialog(getSceneNonNull.getWindow) ))
 	@FXML def onFileReopen(event: ActionEvent) = println(getSceneNonNull.getFocusOwner)
 	@FXML def onFileSave(event: ActionEvent) = Option(editerController.getSelectedItem).foreach(tab => { tab.fileOp match {
-			case None => editerController.addAndSelectTab(new TextTabController( FCM.showSaveDialog(getSceneNonNull.getWindow) ))
+			case None => editerController.addAndSelectTab(new FileTabController( FCM.showSaveDialog(getSceneNonNull.getWindow) ))
 			case Some(file) => tab.save
 	}})
 	@FXML def onFileSaveAs(event: ActionEvent) = println( FCM.showSaveDialog(getSceneNonNull.getWindow) )
@@ -71,10 +50,34 @@ class EditerMenuBarController(val editerController: EditerController) extends Me
 }
 
 
-object TextTabController
+class EditerController extends BorderPane with SceneController {
+	@FXML var mainTabPane: TabPane = _
 
-class TextTabController(val fileOp: Option[File]) extends Tab with RootedController {
-	this.getProperties.put(TextTabController, this)
+	mainTabPane.setTabClosingPolicy(TabClosingPolicy.ALL_TABS)
+	mainTabPane.setFocusTraversable(false)
+
+	override def createMainMenu = Some(new EditerMenuBarController(this))
+
+	def addAndSelectTab(tab: FileTabController) = {
+		mainTabPane.getTabs.add(tab)
+		val sm = mainTabPane.getSelectionModel
+		sm.select(tab)
+	}
+
+	def toClosetab = {
+		val index = mainTabPane.getSelectionModel.getSelectedIndex
+		if(index >= 0) mainTabPane.getTabs.remove(index)
+		else getSceneNonNull.getWindow.hide
+	}
+
+	def getSelectedItem = mainTabPane.getSelectionModel.getSelectedItem.asInstanceOf[FileTabController]
+}
+
+
+object FileTabController
+
+class FileTabController(val fileOp: Option[File]) extends Tab with RootedController {
+	this.getProperties.put(FileTabController, this)
 
 	fileOp.foreach(file => setText(file.getName))
 

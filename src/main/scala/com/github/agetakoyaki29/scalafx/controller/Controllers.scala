@@ -1,4 +1,4 @@
-package kana.editer1
+package com.github.agetakoyaki29.scalafx.controller
 
 import java.io.IOException
 import javafx.fxml.FXMLLoader

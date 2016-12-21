@@ -40,7 +40,7 @@
       </items>
     </Menu>
     <Menu mnemonicParsing="false" text="Edit" />
-    <Menu mnemonicParsing="false" text="Scene">
+    <Menu mnemonicParsing="false" text="Slide">
       <items>
         <MenuItem mnemonicParsing="false" onAction="#onSceneTop" text="Top" />
         <MenuItem mnemonicParsing="false" onAction="#onSceneEditer" text="Editer" />

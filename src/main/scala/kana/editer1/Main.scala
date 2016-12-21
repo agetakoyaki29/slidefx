@@ -24,8 +24,8 @@ class MyApplication extends Application {
 }
 
 
-class TopController extends StackPane with RootedController with SceneController {
-	@FXML def onAction(event: ActionEvent) =  getStageContanerNonNull.moveScene(new EditerController)
+class TopController extends StackPane with RootedController with SlideController {
+	@FXML def onAction(event: ActionEvent) =  getStageContanerNonNull.moveSlide(new EditerController)
 }
 
 
@@ -42,15 +42,15 @@ class EditerMenuBarController(val editerController: EditerController) extends Me
 
 	@FXML def onFileExit(event: ActionEvent) = getSceneNonNull.getWindow.hide
 
-	@FXML def onSceneTop(event: ActionEvent) = getStageContanerNonNull.moveScene(new TopController)
-	@FXML def onSceneEditer(event: ActionEvent) = getStageContanerNonNull.moveScene(new EditerController)
+	@FXML def onSceneTop(event: ActionEvent) = getStageContanerNonNull.moveSlide(new TopController)
+	@FXML def onSceneEditer(event: ActionEvent) = getStageContanerNonNull.moveSlide(new EditerController)
 
 	@FXML def onHelpHelp(event: ActionEvent) = ???
 	@FXML def onHelpAbout(event: ActionEvent) = ???
 }
 
 
-class EditerController extends BorderPane with RootedController with SceneController {
+class EditerController extends BorderPane with RootedController with SlideController {
 	@FXML var mainTabPane: TabPane = _
 	
 	mainTabPane.setTabClosingPolicy(TabClosingPolicy.ALL_TABS)
@@ -59,6 +59,8 @@ class EditerController extends BorderPane with RootedController with SceneContro
 	  val menuBar = Some(new EditerMenuBarController(this))
 	  contaner.setMainMenuBar(menuBar)
 	}
+	
+	override def unstaged(contaner: StageContaner) = contaner.setMainMenuBar(None)
 
 	def addAndSelectTab(tab: FileTabController) = {
 		mainTabPane.getTabs.add(tab)

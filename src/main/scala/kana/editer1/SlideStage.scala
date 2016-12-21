@@ -26,7 +26,9 @@ class StageContaner(val stage: Stage) {
 	
 	; {
 	  menuBarProperty.set(defaultMenuBar)
-	  mainNodes.add(new AnchorPane with SceneController)
+	  defaultMenuBar.setUseSystemMenuBar(true)
+	  
+	  mainNodes.add(new AnchorPane with SlideController)
 	}
 	; {
 		// stage.initStyle(StageStyle.TRANSPARENT)  // initStyle
@@ -35,21 +37,9 @@ class StageContaner(val stage: Stage) {
 		stage.setScene(new Scene(root));
 	}
 
-	def show(firstScene: SceneController) = {
-		moveScene(firstScene)
+	def show(firstSlide: SlideController) = {
+		moveSlide(firstSlide)
 		stage.show
-	}
-
-	def moveScene(next: SceneController) = {
-		// get previous before add
-		val perv = getNow
-		// add and expand
-		addNow(next)
-		// call staged
-		perv.unStaged(this)
-		next.staged(this)
-
-		animateMove(next, perv)
 	}
 
 	def setMainMenuBar(nextOp: Option[MenuBar]) = {
@@ -62,27 +52,39 @@ class StageContaner(val stage: Stage) {
 		}
 	}
 
-	private def addNow(node: SceneController) = {
-	   mainNodes.add(node)
-	   expandAnchorChild(node)
+	def moveSlide(next: SlideController) = {
+		// get previous before add
+		val perv = getNow
+		// add and expand
+		addNow(next)
+		// call staged
+		perv.unstaged(this)
+		next.staged(this)
+
+		animateAndRemove(next, perv)
+	}
+
+	private def addNow(slide: SlideController) = {
+	   mainNodes.add(slide)
+	   expandAnchorChild(slide)
 	}
 	
-	protected def getNow = mainNodes.get(mainNodes.size-1).asInstanceOf[SceneController]
+	protected def getNow = mainNodes.get(mainNodes.size-1).asInstanceOf[SlideController]
 
-	private def expandAnchorChild(node: SceneController) = {
-		AnchorPane.setBottomAnchor(node, 0)
-		AnchorPane.setLeftAnchor(node, 0)
-		AnchorPane.setRightAnchor(node, 0)
-		AnchorPane.setTopAnchor(node, 0)
+	private def expandAnchorChild(slide: SlideController) = {
+		AnchorPane.setBottomAnchor(slide, 0)
+		AnchorPane.setLeftAnchor(slide, 0)
+		AnchorPane.setRightAnchor(slide, 0)
+		AnchorPane.setTopAnchor(slide, 0)
 	}
 
-	private def animateMove(next: Node, prev: Node) = {
+	private def animateAndRemove(next: SlideController, prev: SlideController) = {
 		val duration = Duration.seconds(1)
 		val interpolator = new SineInterpolator(.3)
 		val width = centerPane.getLayoutBounds.getWidth
 		; {
 			val slidIn = new TranslateTransition(duration, next)
-			slidIn.setFromX(width)
+			slidIn.setFromX(width)    // width to 0
 			slidIn.setToX(0)
 			slidIn.setInterpolator(interpolator)
 			slidIn.play
@@ -90,18 +92,18 @@ class StageContaner(val stage: Stage) {
 		; {
 			// prev.setClip(prev.getParent)
 			val slidOut = new TranslateTransition(duration, prev)
-			slidOut.setToX(-width)
+			slidOut.setToX(-width)    // 0 to -width
 			slidOut.setInterpolator(interpolator)
-			slidOut.setOnFinished((_: ActionEvent) => mainNodes.remove(prev))
+			slidOut.setOnFinished((_: ActionEvent) => mainNodes.remove(prev))  // remove on finish
 			slidOut.play
 		}
 	}
 }
 
 
-trait SceneController extends Parent with StagedNode {
+trait SlideController extends Node with StagedNode {
 	def staged(contaner: StageContaner) = {}
-	def unStaged(contaner: StageContaner) = {}
+	def unstaged(contaner: StageContaner) = {}
 }
 
 

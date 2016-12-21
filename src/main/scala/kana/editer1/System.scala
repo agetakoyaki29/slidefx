@@ -12,21 +12,28 @@ import javafx.event.ActionEvent
 object StageContaner
 
 class StageContaner(val stage: Stage) {
-	private val centerPane = new AnchorPane(new AnchorPane)
+	protected val centerPane = new AnchorPane
 	private val root = new BorderPane(centerPane)
 
 	private val mainNodes = centerPane.getChildren
-	private val menuBarProperty = root.topProperty
-	menuBarProperty.set(defaultMenuBar)
+	protected val menuBarProperty = root.topProperty
 
+	protected val defaultMenuBar = {
+	  val menu = new Menu()
+	  menu.setDisable(true)
+	  new MenuBar(menu)
+	}
+	
 	; {
-		// stage.initStyle(StageStyle.TRANSPARENT)
+	  menuBarProperty.set(defaultMenuBar)
+	  mainNodes.add(new AnchorPane with SceneController)
+	}
+	; {
+		// stage.initStyle(StageStyle.TRANSPARENT)  // initStyle
 		// stage.setMaximized(true)
-		stage.getProperties.put(StageContaner, this)
+		stage.getProperties.put(StageContaner, this) // put this to stage properties
 		stage.setScene(new Scene(root));
 	}
-
-	private def getNow = mainNodes.get(mainNodes.size-1)
 
 	def show(firstScene: SceneController) = {
 		moveScene(firstScene)
@@ -34,20 +41,15 @@ class StageContaner(val stage: Stage) {
 	}
 
 	def moveScene(next: SceneController) = {
-		setMainMenuBar(next.createMainMenu)
+		// get previous before add
 		val perv = getNow
-		addCenterPane(next)
-		next.staged
+		// add and expand
+		addNow(next)
+		// call staged
+		perv.unStaged(this)
+		next.staged(this)
 
 		animateMove(next, perv)
-	}
-
-	private def addCenterPane(node: SceneController) = {
-		mainNodes.add(node)
-		AnchorPane.setBottomAnchor(node, 0)
-		AnchorPane.setLeftAnchor(node, 0)
-		AnchorPane.setRightAnchor(node, 0)
-		AnchorPane.setTopAnchor(node, 0)
 	}
 
 	def setMainMenuBar(nextOp: Option[MenuBar]) = {
@@ -60,7 +62,19 @@ class StageContaner(val stage: Stage) {
 		}
 	}
 
-	private lazy val defaultMenuBar = new MenuBar(new Menu("null"))
+	private def addNow(node: SceneController) = {
+	   mainNodes.add(node)
+	   expandAnchorChild(node)
+	}
+	
+	protected def getNow = mainNodes.get(mainNodes.size-1).asInstanceOf[SceneController]
+
+	private def expandAnchorChild(node: SceneController) = {
+		AnchorPane.setBottomAnchor(node, 0)
+		AnchorPane.setLeftAnchor(node, 0)
+		AnchorPane.setRightAnchor(node, 0)
+		AnchorPane.setTopAnchor(node, 0)
+	}
 
 	private def animateMove(next: Node, prev: Node) = {
 		val duration = Duration.seconds(1)
@@ -85,9 +99,9 @@ class StageContaner(val stage: Stage) {
 }
 
 
-trait SceneController extends Parent with RootedController with StagedNode {
-	def createMainMenu: Option[MenuBar] = None
-	def staged = {}
+trait SceneController extends Parent with StagedNode {
+	def staged(contaner: StageContaner) = {}
+	def unStaged(contaner: StageContaner) = {}
 }
 
 
@@ -105,7 +119,7 @@ trait StagedNode extends Node {
 		val value = Option(getWindowNonNull.getProperties.get(StageContaner))
 			.getOrElse(throw new StagedNodeException("this window("+getWindowNonNull+") isn't a StageContaner"))
 		Option(value.asInstanceOf[StageContaner])
-			.getOrElse(throw new StagedNodeException("this window("+getWindowNonNull+") isn't a StageContaner"))
+			.getOrElse(throw new StagedNodeException("the property("+StageContaner+") isn't a StageContaner"))
 	}
 
 	def isOnScene = try {getSceneNonNull; true} catch {case e: StagedNodeException => false}

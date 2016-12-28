@@ -96,6 +96,8 @@ class StageContaner(val stage: Stage) {
 			val slidOut = new TranslateTransition(duration, prev)
 			slidOut.setToX(-width)    // 0 to -width
 			slidOut.setInterpolator(interpolator)
+			// implicit def f2EH for 2.11.8
+			implicit def f2EH(f: ActionEvent ⇒ Boolean): javafx.event.EventHandler[ActionEvent] = new javafx.event.EventHandler[ActionEvent]() { override def handle(evt: ActionEvent) {f(evt)} }
 			slidOut.setOnFinished((_: ActionEvent) => mainNodes.remove(prev))  // remove on finish
 			slidOut.play
 		}

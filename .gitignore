@@ -5,8 +5,9 @@ project/
 .tmpBin/
 
 # Eclipse
-.classpath
+bin/
 .settings/
 .project
+.classpath
 .cache-main
-bin/
+.cache-tests

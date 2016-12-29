@@ -2,9 +2,11 @@
 val scalactic = "org.scalactic" %% "scalactic" % "2.2.5"
 val scalatest = "org.scalatest" %% "scalatest" % "2.2.5" % "test"
 
+val pscalafx = RootProject(uri("git://github.com/agetakoyaki29/scalafx.git"))
+
 lazy val root = (project in file(".")).
   settings(
-    name := "scala editer fx",
+    name := "slidefx",
     version := "0.0",
     scalaVersion := "2.11.8",
 
@@ -19,4 +21,5 @@ lazy val root = (project in file(".")).
     libraryDependencies += scalatest,
 
     logBuffered in Test := false
-  )
+  ).
+  dependsOn(pscalafx)

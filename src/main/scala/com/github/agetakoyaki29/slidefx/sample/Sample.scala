@@ -1,4 +1,4 @@
-package com.github.agetakoyaki29.scalafx.stage
+package com.github.agetakoyaki29.slidefx.sample
 
 import java.io.File
 import javafx.fxml.FXML
@@ -10,18 +10,21 @@ import javafx.scene.control.{TabPane, Tab, MenuBar}
 import javafx.scene.control.TabPane.TabClosingPolicy
 import javafx.event.ActionEvent
 
-import com.github.agetakoyaki29.scalafx.controller.RootedController
+import com.github.agetakoyaki29.slidefx.controller.RootedController
+import com.github.agetakoyaki29.slidefx.SlideController
+import com.github.agetakoyaki29.slidefx.StageContainer
+import com.github.agetakoyaki29.slidefx.StagedNode
 
 
-object Main {
+object Sample {
 	def main(args: Array[String]) {
 		println("helo")
-		Application.launch(classOf[MyApplication], args:_*)
+		Application.launch(classOf[SampleApplication], args:_*)
 	}
 }
 
 
-class MyApplication extends Application {
+class SampleApplication extends Application {
 	override def start(stage: Stage) = new StageContainer(stage).show(new TopController)
 }
 

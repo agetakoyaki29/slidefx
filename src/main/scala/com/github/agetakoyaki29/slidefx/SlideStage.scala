@@ -1,4 +1,4 @@
-package com.github.agetakoyaki29.scalafx.stage
+package com.github.agetakoyaki29.slidefx
 
 import javafx.stage.Stage
 import javafx.scene.{Scene, Node}
@@ -9,6 +9,8 @@ import javafx.util.Duration
 import javafx.event.ActionEvent
 
 import com.github.agetakoyaki29.scalafx.animation.SineInterpolator
+import com.github.agetakoyaki29.slidefx.StageContainer;
+import com.github.agetakoyaki29.slidefx.StagedNodeException;
 
 
 object StageContainer

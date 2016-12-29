@@ -2,30 +2,58 @@ package com.github.agetakoyaki29.slidefx.controller
 
 import java.io.IOException
 import javafx.fxml.FXMLLoader
+import javafx.scene.Node
+import javafx.scene.control.Tab
 
 
-trait RootedController {
-	; {
-		val loader = new FXMLLoader(getLocation)
-		loader.setRoot(this)
-		loader.setController(this)
-		try loader.load
-		catch { case e: IOException =>
-			throw new RootedControllerException("fxml loader can't load with location("+getLocation+").", e)
-		}
-	}
+trait FXMLController {
+	val prefix = "C"
 
-	def getPrefix = "C"
-
-	def getFileName = {
+	val filename = {
 		val className = getClass.getSimpleName
-		val lastIndex = className.lastIndexOf(getPrefix)
-		if(lastIndex < 0) throw new RootedControllerException("class name("+className+") doesn't include prefix("+getPrefix+").")
+		val lastIndex = className.lastIndexOf(prefix)
+		if(lastIndex < 0) throw new IllegalStateException("class name("+className+") doesn't include prefix("+prefix+").")
 		className.substring(0, lastIndex) + ".fxml"
 	}
 
-	def getLocation = Option(getClass.getResource(getFileName))
-			.getOrElse(throw new RootedControllerException("class loader("+getClass+") can't find file with name("+getFileName+")."))
+	val location = Option(getClass.getResource(filename))
+			.getOrElse(throw new IllegalStateException("class loader("+getClass+") can't find file with name("+filename+")."))
+
+	protected val loader = new FXMLLoader(location)
 }
 
-class RootedControllerException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
+
+trait RootedController extends FXMLController {
+	; {
+		loader.setController(this)
+		loader.setRoot(this)
+		loader.load
+	}
+}
+
+
+object LoadedController
+
+trait LoadedController extends FXMLController {
+	val root: Any = {
+		loader.setController(this)
+		// load
+		try loader.load
+		catch { case e: IOException =>
+			throw new LoadedControllerException("fxml loader can't load with location("+location+").", e)
+		}
+		// get root
+		loader.getRoot
+	}
+	; {
+		// put controller to root
+		(root match {
+		  case node: Node => node.getProperties
+		  case tab: Tab => tab.getProperties
+		  case _ => ???
+		}).put(LoadedController, this)
+	}
+}
+
+class LoadedControllerException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
+

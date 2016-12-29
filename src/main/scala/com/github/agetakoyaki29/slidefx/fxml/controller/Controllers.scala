@@ -1,4 +1,4 @@
-package com.github.agetakoyaki29.slidefx.controller
+package com.github.agetakoyaki29.slidefx.fxml.controller
 
 import java.io.IOException
 import javafx.fxml.FXMLLoader

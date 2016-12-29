@@ -10,7 +10,7 @@ import javafx.scene.control.{TabPane, Tab, MenuBar}
 import javafx.scene.control.TabPane.TabClosingPolicy
 import javafx.event.ActionEvent
 
-import com.github.agetakoyaki29.slidefx.controller.RootedController
+import com.github.agetakoyaki29.slidefx.fxml.controller.RootedController
 import com.github.agetakoyaki29.slidefx.SlideController
 import com.github.agetakoyaki29.slidefx.StageContainer
 import com.github.agetakoyaki29.slidefx.StagedNode

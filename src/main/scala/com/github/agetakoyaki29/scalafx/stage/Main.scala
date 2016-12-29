@@ -22,7 +22,7 @@ object Main {
 
 
 class MyApplication extends Application {
-	override def start(stage: Stage) = new StageContaner(stage).show(new TopController)
+	override def start(stage: Stage) = new StageContainer(stage).show(new TopController)
 }
 
 
@@ -57,12 +57,12 @@ class EditerController extends BorderPane with RootedController with SlideContro
 	
 	mainTabPane.setTabClosingPolicy(TabClosingPolicy.ALL_TABS)
 	
-	override def staged(contaner: StageContaner) = {
+	override def staged(contaner: StageContainer) = {
 	  val menuBar = Some(new EditerMenuBarController(this))
 	  contaner.setMainMenuBar(menuBar)
 	}
 	
-	override def unstaged(contaner: StageContaner) = contaner.setMainMenuBar(None)
+	override def unstaged(contaner: StageContainer) = contaner.setMainMenuBar(None)
 
 	def addAndSelectTab(tab: FileTabController) = {
 		mainTabPane.getTabs.add(tab)

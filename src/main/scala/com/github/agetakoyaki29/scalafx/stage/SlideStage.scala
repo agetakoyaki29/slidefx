@@ -11,9 +11,9 @@ import javafx.event.ActionEvent
 import com.github.agetakoyaki29.scalafx.animation.SineInterpolator
 
 
-object StageContaner
+object StageContainer
 
-class StageContaner(val stage: Stage) {
+class StageContainer(val stage: Stage) {
 	protected val centerPane = new AnchorPane
 	private val root = new BorderPane(centerPane)
 
@@ -35,7 +35,7 @@ class StageContaner(val stage: Stage) {
 	; {
 		// stage.initStyle(StageStyle.TRANSPARENT)  // initStyle
 		// stage.setMaximized(true)
-		stage.getProperties.put(StageContaner, this) // put this to stage properties
+		stage.getProperties.put(StageContainer, this) // put this to stage properties
 		stage.setScene(new Scene(root));
 	}
 
@@ -106,8 +106,8 @@ class StageContaner(val stage: Stage) {
 
 
 trait SlideController extends Node with StagedNode {
-	def staged(contaner: StageContaner) = {}
-	def unstaged(contaner: StageContaner) = {}
+	def staged(contaner: StageContainer) = {}
+	def unstaged(contaner: StageContainer) = {}
 }
 
 
@@ -122,10 +122,10 @@ trait StagedNode extends Node {
 		.getOrElse(throw new StagedNodeException("this window("+getWindowNonNull+") isn't a Stage"))
 
 	def getStageContanerNonNull = {
-		val value = Option(getWindowNonNull.getProperties.get(StageContaner))
+		val value = Option(getWindowNonNull.getProperties.get(StageContainer))
 			.getOrElse(throw new StagedNodeException("this window("+getWindowNonNull+") isn't a StageContaner"))
-		Option(value.asInstanceOf[StageContaner])
-			.getOrElse(throw new StagedNodeException("the property("+StageContaner+") isn't a StageContaner"))
+		Option(value.asInstanceOf[StageContainer])
+			.getOrElse(throw new StagedNodeException("the property("+StageContainer+") isn't a StageContaner"))
 	}
 
 	def isOnScene = try {getSceneNonNull; true} catch {case e: StagedNodeException => false}

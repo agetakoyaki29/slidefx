@@ -1,16 +1,17 @@
 package com.github.agetakoyaki29.slidefx
 
-import javafx.stage.Stage
-import javafx.scene.{Scene, Node}
-import javafx.scene.layout.{BorderPane, AnchorPane}
-import javafx.scene.control.{MenuBar, Menu}
-import javafx.animation.TranslateTransition
-import javafx.util.Duration
-import javafx.event.ActionEvent
-
 import com.github.agetakoyaki29.scalafx.animation.SineInterpolator
-import com.github.agetakoyaki29.slidefx.StageContainer;
-import com.github.agetakoyaki29.slidefx.StagedNodeException;
+
+import javafx.animation.TranslateTransition
+import javafx.event.ActionEvent
+import javafx.scene.Node
+import javafx.scene.Scene
+import javafx.scene.control.Menu
+import javafx.scene.control.MenuBar
+import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.BorderPane
+import javafx.stage.Stage
+import javafx.util.Duration;
 
 
 object StageContainer

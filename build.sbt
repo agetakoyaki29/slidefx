@@ -2,8 +2,9 @@
 lazy val root = (project in file("."))
   .settings(fxmlSettings: _*)
   .settings(
+    organization := "com.github.agetakoyaki29",
     name := "slidefx",
-    version := "0.0",
+    version := "1.0",
     scalaVersion := "2.11.8",
 
     libraryDependencies += scalactic,
@@ -27,4 +28,4 @@ lazy val scalactic = "org.scalactic" %% "scalactic" % "2.2.5"
 lazy val scalatest = "org.scalatest" %% "scalatest" % "2.2.5" % "test"
 
 // ---- project ----
-lazy val scalafx = RootProject(uri("git://github.com/agetakoyaki29/scalafx.git"))
+lazy val scalafx = RootProject(uri("git://github.com/agetakoyaki29/scalafx"))
